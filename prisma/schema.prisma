@@ -1,0 +1,255 @@
+// This is your Prisma schema file for Portfolio Project
+// Phase 1 Configuration - Full Stack Next.js + Express.js + MySQL
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// User Model - Authentication et Informations Admin
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  password    String
+  name        String
+  role        Role     @default(ADMIN)
+  bio         String?  @db.Text
+  avatar      String?
+  location    String?
+  website     String?
+  linkedin    String?
+  github      String?
+  twitter     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  projects    Project[]
+  experiences Experience[]
+  educations  Education[]
+  blogPosts   BlogPost[]
+  contacts    Contact[]
+
+  @@map("users")
+}
+
+// Category Model - Catégories pour projets et compétences
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  color       String?   // Couleur hex pour l'affichage
+  icon        String?   // Nom de l'icône
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  projects    Project[]
+  skills      Skill[]
+
+  @@map("categories")
+}
+
+// Project Model - Projets Portfolio
+model Project {
+  id          String     @id @default(cuid())
+  title       String
+  slug        String     @unique
+  description String     @db.Text
+  shortDesc   String?    @db.VarChar(255)
+  content     String?    @db.LongText // Contenu Markdown
+  status      ProjectStatus @default(PUBLISHED)
+  featured    Boolean    @default(false)
+  priority    Int        @default(0) // Ordre d'affichage
+
+  // URLs et liens
+  liveUrl     String?
+  githubUrl   String?
+  figmaUrl    String?
+
+  // Media
+  image       String?    // Image principale
+  gallery     String?    @db.Text // JSON array des images
+
+  // Technologies
+  technologies String?   @db.Text // JSON array des technologies
+
+  // Dates
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId  String?
+  category    Category?  @relation(fields: [categoryId], references: [id])
+
+  @@map("projects")
+}
+
+// Experience Model - Expériences professionnelles
+model Experience {
+  id          String    @id @default(cuid())
+  title       String    // Poste
+  company     String    // Entreprise
+  location    String?   // Lieu
+  description String?   @db.Text
+  technologies String?  @db.Text // JSON array
+  type        ExpType   @default(FULLTIME)
+
+  startDate   DateTime
+  endDate     DateTime?
+  current     Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("experiences")
+}
+
+// Education Model - Formations
+model Education {
+  id          String    @id @default(cuid())
+  degree      String    // Diplôme
+  school      String    // École/Université
+  field       String?   // Domaine d'étude
+  location    String?
+  description String?   @db.Text
+  grade       String?   // Note/Mention
+
+  startDate   DateTime
+  endDate     DateTime?
+  current     Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("educations")
+}
+
+// Skill Model - Compétences techniques
+model Skill {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  level       SkillLevel @default(INTERMEDIATE)
+  yearsExp    Int?      // Années d'expérience
+  description String?
+  icon        String?   // Nom de l'icône
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+
+  @@map("skills")
+}
+
+// BlogPost Model - Articles de blog (optionnel)
+model BlogPost {
+  id          String     @id @default(cuid())
+  title       String
+  slug        String     @unique
+  excerpt     String?    @db.VarChar(255)
+  content     String     @db.LongText // Contenu Markdown
+  status      PostStatus @default(DRAFT)
+  featured    Boolean    @default(false)
+
+  // SEO
+  metaTitle   String?
+  metaDesc    String?
+
+  // Media
+  image       String?
+  readingTime Int?       // Minutes de lecture
+
+  // Dates
+  publishedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("blog_posts")
+}
+
+// Contact Model - Messages de contact
+model Contact {
+  id        String       @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  message   String       @db.Text
+  status    ContactStatus @default(UNREAD)
+
+  // Informations additionnelles
+  phone     String?
+  company   String?
+  website   String?
+
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  // Relations
+  userId    String?
+  user      User?        @relation(fields: [userId], references: [id])
+
+  @@map("contacts")
+}
+
+// ENUMS
+enum Role {
+  ADMIN
+  USER
+}
+
+enum ProjectStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ContactStatus {
+  UNREAD
+  READ
+  REPLIED
+  ARCHIVED
+}
+
+enum ExpType {
+  FULLTIME
+  PARTTIME
+  FREELANCE
+  INTERNSHIP
+  CONTRACT
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}

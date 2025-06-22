@@ -16,6 +16,7 @@ import authRoutes from './routes/auth.routes';
 // import contactRoutes from './routes/contact.routes';
 import blogRoutes from './routes/blog.routes';
 // import uploadRoutes from './routes/upload.routes';
+import githubRoutes from './routes/github.routes';
 
 // Import des middlewares
 import { errorHandler } from './middleware/errorHandler';
@@ -134,7 +135,7 @@ class Server {
         // this.app.use('/api/contacts', contactRoutes);
         this.app.use('/api/blog', blogRoutes);
         // this.app.use('/api/uploads', uploadRoutes);
-        // this.app.use('/api/githubstats', statsRoutes);
+        this.app.use('/api/github', githubRoutes);
     }
 
     private initializeErrorHandling(): void {

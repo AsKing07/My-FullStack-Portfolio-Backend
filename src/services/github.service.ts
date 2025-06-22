@@ -9,8 +9,8 @@ const githubApi = axios.create({
     baseURL: 'https://api.github.com',
     headers: {
         'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'YourAppName', // Remplacez par le nom de votre application
-        'Authorization': 'token ' + process.env.GITHUB_TOKEN // Assurez-vous que le token est stocké dans les variables d'environnement
+        'User-Agent': 'Charbel SONON - Portfolio', 
+        'Authorization': 'token ' + process.env.GITHUB_TOKEN
     }
 });
 

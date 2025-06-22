@@ -1,31 +1,29 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import compression from 'compression';
 import rateLimit from 'express-rate-limit';
-import { config } from 'dotenv';
+require('dotenv').config(); 
 import path from 'path';
 import fs from 'fs';
 
 // Import des routes
 import authRoutes from './routes/auth.routes';
-import userRoutes from './routes/user.routes';
-import projectRoutes from './routes/project.routes';
-import categoryRoutes from './routes/category.routes';
-import skillRoutes from './routes/skill.routes';
-import experienceRoutes from './routes/experience.routes';
-import educationRoutes from './routes/education.routes';
-import contactRoutes from './routes/contact.routes';
-import blogRoutes from './routes/blog.routes';
-import uploadRoutes from './routes/upload.routes';
+// import userRoutes from './routes/user.routes';
+// import projectRoutes from './routes/project.routes';
+// import categoryRoutes from './routes/category.routes';
+// import skillRoutes from './routes/skill.routes';
+// import experienceRoutes from './routes/experience.routes';
+// import educationRoutes from './routes/education.routes';
+// import contactRoutes from './routes/contact.routes';
+// import blogRoutes from './routes/blog.routes';
+// import uploadRoutes from './routes/upload.routes';
 
 // Import des middlewares
 import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
 import { requestLogger } from './middleware/logger';
 
-// Configuration des variables d'environnement
-config();
+
 
 class Server {
     private app: Application;
@@ -110,8 +108,7 @@ class Server {
         this.app.use('/api/', limiter);
         this.app.use('/api/auth', authLimiter);
 
-        // Compression des réponses
-        this.app.use(compression());
+
 
         // Parsing des requêtes
         this.app.use(express.json({ limit: '10mb' }));
@@ -159,15 +156,16 @@ class Server {
 
         // Routes API
         this.app.use('/api/auth', authRoutes);
-        this.app.use('/api/users', userRoutes);
-        this.app.use('/api/projects', projectRoutes);
-        this.app.use('/api/categories', categoryRoutes);
-        this.app.use('/api/skills', skillRoutes);
-        this.app.use('/api/experiences', experienceRoutes);
-        this.app.use('/api/educations', educationRoutes);
-        this.app.use('/api/contacts', contactRoutes);
-        this.app.use('/api/blog', blogRoutes);
-        this.app.use('/api/uploads', uploadRoutes);
+        // this.app.use('/api/users', userRoutes);
+        // this.app.use('/api/projects', projectRoutes);
+        // this.app.use('/api/categories', categoryRoutes);
+        // this.app.use('/api/skills', skillRoutes);
+        // this.app.use('/api/experiences', experienceRoutes);
+        // this.app.use('/api/educations', educationRoutes);
+        // this.app.use('/api/contacts', contactRoutes);
+        // this.app.use('/api/blog', blogRoutes);
+        // this.app.use('/api/uploads', uploadRoutes);
+        // this.app.use('/api/githubstats', statsRoutes);
     }
 
     private initializeErrorHandling(): void {

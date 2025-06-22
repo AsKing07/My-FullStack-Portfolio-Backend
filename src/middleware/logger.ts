@@ -14,15 +14,15 @@ morgan.token('query', (req: Request) => {
 export const requestLogger = morgan((tokens, req, res) => {
     return [
         '🌐',
-        tokens.method(req, res),
-        tokens.url(req, res),
-        tokens.status(req, res),
-        tokens.res(req, res, 'content-length'), '-',
-        tokens['response-time'](req, res), 'ms',
-        req.method === 'POST' || req.method === 'PUT' ? 
-            `Body: ${tokens.body(req, res)}` : '',
-        Object.keys(req.query).length > 0 ? 
-            `Query: ${tokens.query(req, res)}` : ''
+        tokens.method?.(req, res),
+        tokens.url?.(req, res),
+        tokens.status?.(req, res),
+        tokens.res?.(req, res, 'content-length'), '-',
+        tokens['response-time']?.(req, res), 'ms',
+        req.method === 'POST' || req.method === 'PUT'
+            ? `Body: ${tokens.body ? tokens.body(req, res) : ''}` : '',
+        Object.keys((req as Request).query).length > 0 ? 
+            `Query: ${tokens.query ? tokens.query(req, res) : ''}` : ''
     ].filter(Boolean).join(' ');
 });
 

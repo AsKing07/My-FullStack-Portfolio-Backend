@@ -27,7 +27,9 @@
       "@/services/*": ["src/services/*"],
       "@/types/*": ["src/types/*"],
       "@/utils/*": ["src/utils/*"],
-      "@/config/*": ["src/config/*"]
+      "@/config/*": ["src/config/*"],
+      "@/prisma/*": ["prisma/*"]
+      
     }
   },
   "include": [
@@ -41,6 +43,6 @@
     "**/*.spec.ts"
   ],
   "ts-node": {
-    "require": ["tsconfig-paths/register"]
+    // "require": ["tsconfig-paths/register"]
   }
 }

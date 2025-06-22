@@ -56,48 +56,28 @@ model User {
   password    String
   name        String
   role        Role        @default(USER)
+  title       String?
+  subtitle    String?
   bio         String?     @db.Text
-  avatar      String?
+  avatarUrl      String?
   location    String?
   website     String?
   linkedin    String?
   github      String?
   twitter     String?
+  phone       String?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
+  resumeUrl   String?
+
   // Relations
-  profile     Profile?
   projects    Project[]
   experiences Experience[]
   educations  Education[]
   blogPosts   BlogPost[]
   contacts    Contact[]
-}
-
-// PROFILE
-model Profile {
-  id            String      @id @default(uuid())
-  title         String
-  subtitle      String?
-  description   String      @db.Text
-  resumeUrl     String?
-  avatarUrl     String?
-  githubUrl     String?
-  linkedinUrl   String?
-  twitterUrl    String?
-  email         String?
-  phone         String?
-  location      String?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  // Relations
-  userId        String?     @unique
-  user          User?       @relation(fields: [userId], references: [id])
-  skills        Skill[]
-  experiences   Experience[]
-  educations    Education[]
+  Skills      Skill[]
 }
 
 // CATEGORY
@@ -157,8 +137,8 @@ model Skill {
   updatedAt   DateTime    @updatedAt
 
   // Relations
-  profileId   String?
-  profile     Profile?    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   categoryId  String?
   category    Category?   @relation(fields: [categoryId], references: [id])
 }
@@ -181,9 +161,7 @@ model Experience {
   // Relations
   userId      String
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  profileId   String?
-  profile     Profile?    @relation(fields: [profileId], references: [id], onDelete: Cascade)
-}
+ }
 
 // EDUCATION
 model Education {
@@ -203,9 +181,7 @@ model Education {
   // Relations
   userId      String
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  profileId   String?
-  profile     Profile?    @relation(fields: [profileId], references: [id], onDelete: Cascade)
-}
+  }
 
 // BLOGPOST
 model BlogPost {

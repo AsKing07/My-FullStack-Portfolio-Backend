@@ -50,7 +50,7 @@ export const getProjects = asyncHandler(async (req: Request, res: Response) => {
                 user: {
                     select: {
                         name: true,
-                        avatar: true
+                        avatarUrl: true
                     }
                 }
             },
@@ -96,7 +96,7 @@ export const getProject = asyncHandler(async (req: Request, res: Response) => {
             user: {
                 select: {
                     name: true,
-                    avatar: true
+                    avatarUrl: true
                 }
             }
         }

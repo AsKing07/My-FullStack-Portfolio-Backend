@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import { asyncHandler, createError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
 import { generateTokens } from '../middleware/auth';
+import { deleteImage, deletePdf, saveImage, savePdf } from '@/utils/saveFile_utils';
 
 
 const prisma = new PrismaClient();
@@ -100,12 +101,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
         success: true,
         message: 'Connexion réussie',
         data: {
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role
-            },
+            user: user,
             token: token.accessToken,
             refreshToken: token.refreshToken
         }
@@ -148,28 +144,38 @@ export const refreshToken = asyncHandler(async (req: Request, res: Response) => 
     }
 });
 
-// @desc    Obtenir le profil utilisateur
-// @route   GET /api/auth/profile
+// @desc    Obtenir le profil utilisateur par l'admin
+// @route   GET /api/auth/userByAdmin
 // @access  Private
-export const getProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const user = await prisma.user.findUnique({
-        where: { id: req.user!.id },
-        select: {
-            id: true,         
-            name: true,
+export const getUser = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const user = await prisma.user.findFirst();
+
+    res.json({
+        success: true,
+        data: { user }
+    });
+});
+
+// @desc    Obtenir le profil utilisateur publiquement
+// @route   GET /api/auth/user
+// @access  Public
+export const getUserPublic = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const user = await prisma.user.findFirst({
+        select:{
             email: true,
-            role: true,
+            name: true, 
+            title: true,
+            subtitle: true,
             bio: true,
-            avatar: true,
+            avatarUrl: true,
             location: true,
             website: true,
             linkedin: true,
             github: true,
             twitter: true,
-            createdAt: true,
-            updatedAt: true,
-
+            phone: true,
         }
+
     });
 
     res.json({
@@ -178,13 +184,15 @@ export const getProfile = asyncHandler(async (req: AuthRequest, res: Response) =
     });
 });
 
-// @desc    Mettre à jour le profil
-// @route   PUT /api/auth/profile
+
+
+// @desc    Mettre à jour le profil utilisateur
+// @route   PUT /api/auth/user
 // @access  Private
-export const updateProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const updateUser = asyncHandler(async (req: AuthRequest, res: Response) => {
     const allowedFields = [
-        'name', 'bio', 'avatar', 'location', 
-        'website', 'linkedin', 'github', 'twitter'
+        'name', 'title', 'subtitle', 'bio', 'avatarUrl', 'location', 
+        'website', 'linkedin', 'github', 'twitter', 'phone'
     ];
 
     const updateData: any = {};
@@ -195,33 +203,75 @@ export const updateProfile = asyncHandler(async (req: AuthRequest, res: Response
             updateData[key] = req.body[key];
         }
     });
+    
+    const user = await prisma.user.findFirst({
+ 
+    });
+    if (!user) {
+        throw createError('Utilisateur non trouvé', 404);
+    }
 
-    const user = await prisma.user.update({
+    if (req.file){
+         updateData['avatarUrl'] = await saveImage(req.file, 'userAvatar');
+         if(user.avatarUrl) {
+            // Supprimer l'ancienne image si elle existe
+            await deleteImage(user.avatarUrl);
+        }
+
+    }
+
+
+    
+
+
+    const updateUser = await prisma.user.update({
         where: { id: req.user!.id },
         data: updateData,
-        select: {
-            id: true,
-            name: true,
-            email: true,
-            role: true,
-            bio: true,
-            avatar: true,
-            location: true,
-            website: true,
-            linkedin: true,
-            github: true,
-            twitter: true,
-            updatedAt: true
-        }
     });
 
     res.json({
         success: true,
         message: 'Profil mis à jour avec succès',
-        data: { user }
+        data: { user: updateUser }
     });
 });
 
+// @desc Mettre à jour le CV
+// @route PUT /api/auth/user/resume
+// @access Private
+export const updateResume = asyncHandler(async (req: AuthRequest, res: Response) => {
+    if (!req.file) {
+        throw createError('Aucun fichier CV fourni', 400);
+    }
+
+    const newResumeUrl = await savePdf(req.file, 'cv');
+    const user = await prisma.user.findFirst();
+    if (!user) {
+        throw createError('Utilisateur non trouvé', 404);
+    }
+    if (user.resumeUrl) {
+        await deletePdf(user.resumeUrl);
+    }
+
+
+    const updateCv = await prisma.user.update({
+        where: { id: req.user!.id },
+        data: { resumeUrl: newResumeUrl },
+        select:{
+            resumeUrl: true
+        }
+    });
+    res.json({
+        success: true,
+        message: 'CV mis à jour avec succès',
+        data: { resume: updateCv.resumeUrl }
+    });
+});
+
+
+// @desc    Mettre à jour le mot de passe
+// @route   PUT /api/auth/updatePassword
+// @access  Private
 export const updatePassword = asyncHandler(async (req: AuthRequest, res: Response) => {
     const { currentPassword, newPassword } = req.body;
     if (!currentPassword || !newPassword) {
@@ -255,3 +305,4 @@ export const updatePassword = asyncHandler(async (req: AuthRequest, res: Respons
         data: { user: updatedUser }
     });
 });
+

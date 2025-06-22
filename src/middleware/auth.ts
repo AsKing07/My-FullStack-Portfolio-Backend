@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { asyncHandler, createError } from './errorHandler';
 import { PrismaClient } from '@prisma/client';
 
@@ -10,6 +10,8 @@ export interface AuthRequest extends Request {
         id: string;
         email: string;
         role: string;
+        currentPassword?: string;
+        newPassword?: string;
     };
 }
 
@@ -108,3 +110,36 @@ export const optionalAuth = asyncHandler(async (
 
     next();
 });
+
+// Génération des tokens JWT
+
+export const generateTokens = (userId: string) => {
+const expiresInAccess: SignOptions['expiresIn'] =
+  (process.env.JWT_EXPIRES_IN ?? '24h') as SignOptions['expiresIn'];
+
+const expiresInRefresh: SignOptions['expiresIn'] =
+  (process.env.JWT_REFRESH_EXPIRES_IN ?? '7d') as SignOptions['expiresIn'];
+
+  
+  if (!expiresInAccess || !expiresInRefresh ) {
+    throw new Error('Les variables d’environnement JWT sont manquantes.');
+  }
+
+const accessToken = jwt.sign(
+    { id: userId },
+    process.env.JWT_SECRET as string,
+    { expiresIn: expiresInAccess }
+);
+
+const refreshToken = jwt.sign(
+    { id: userId },
+    process.env.JWT_REFRESH_SECRET as string,
+    { expiresIn: expiresInRefresh }
+);
+
+
+    return { accessToken, refreshToken };
+};
+
+
+

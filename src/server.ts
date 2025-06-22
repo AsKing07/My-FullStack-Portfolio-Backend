@@ -1,10 +1,9 @@
-import express, { Application, Request, Response, NextFunction } from 'express';
-import cors from 'cors';
+require('dotenv').config(); 
+import express, { Application, Request, Response } from 'express';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-require('dotenv').config(); 
+import { PrismaClient } from '@prisma/client';
 import path from 'path';
-import fs from 'fs';
 
 // Import des routes
 import authRoutes from './routes/auth.routes';
@@ -15,14 +14,15 @@ import authRoutes from './routes/auth.routes';
 // import experienceRoutes from './routes/experience.routes';
 // import educationRoutes from './routes/education.routes';
 // import contactRoutes from './routes/contact.routes';
-// import blogRoutes from './routes/blog.routes';
+import blogRoutes from './routes/blog.routes';
 // import uploadRoutes from './routes/upload.routes';
 
 // Import des middlewares
 import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
 import { requestLogger } from './middleware/logger';
-
+import { prisma } from './config/prisma';
+const corsMiddleware = require('./middleware/cors');
 
 
 class Server {
@@ -32,6 +32,7 @@ class Server {
     constructor() {
         this.app = express();
         this.port = process.env.PORT || 3001;
+        const prisma = new PrismaClient();
 
         this.initializeMiddlewares();
         this.initializeRoutes();
@@ -52,40 +53,8 @@ class Server {
             crossOriginEmbedderPolicy: false,
         }));
 
-        // Configuration CORS
-        const corsOptions = {
-            origin: (origin: string | undefined, callback: Function) => {
-                const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
-                    'http://localhost:3000',
-                    'http://localhost:3001',
-                    'https://vercel.app',
-                    'https://*.vercel.app'
-                ];
-
-                // Permettre les requêtes sans origin (mobile apps, etc.)
-                if (!origin) return callback(null, true);
-
-                if (allowedOrigins.includes(origin) || 
-                    allowedOrigins.some(allowed => origin.includes(allowed.replace('*', '')))) {
-                    callback(null, true);
-                } else {
-                    callback(new Error('Not allowed by CORS'));
-                }
-            },
-            credentials: true,
-            methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-            allowedHeaders: [
-                'Origin',
-                'X-Requested-With',
-                'Content-Type',
-                'Accept',
-                'Authorization',
-                'Cache-Control',
-                'X-File-Name'
-            ],
-        };
-
-        this.app.use(cors(corsOptions));
+        // Cors pour les requêtes cross-origin
+        this.app.use(corsMiddleware);
 
         // Rate limiting
         const limiter = rateLimit({
@@ -141,15 +110,15 @@ class Server {
                 version: '1.0.0',
                 endpoints: {
                     auth: '/api/auth',
-                    users: '/api/users',
-                    projects: '/api/projects',
-                    categories: '/api/categories',
-                    skills: '/api/skills',
-                    experiences: '/api/experiences',
-                    educations: '/api/educations',
-                    contacts: '/api/contacts',
-                    blog: '/api/blog',
-                    uploads: '/api/uploads',
+                    // users: '/api/users',
+                    // projects: '/api/projects',
+                    // categories: '/api/categories',
+                    // skills: '/api/skills',
+                    // experiences: '/api/experiences',
+                    // educations: '/api/educations',
+                    // contacts: '/api/contacts',
+                    // blog: '/api/blog',
+                    // uploads: '/api/uploads',
                 }
             });
         });
@@ -163,7 +132,7 @@ class Server {
         // this.app.use('/api/experiences', experienceRoutes);
         // this.app.use('/api/educations', educationRoutes);
         // this.app.use('/api/contacts', contactRoutes);
-        // this.app.use('/api/blog', blogRoutes);
+        this.app.use('/api/blog', blogRoutes);
         // this.app.use('/api/uploads', uploadRoutes);
         // this.app.use('/api/githubstats', statsRoutes);
     }
@@ -176,7 +145,13 @@ class Server {
         this.app.use(errorHandler);
     }
 
-    public start(): void {
+    public async start(): Promise<void> { 
+        // Vérifier la connexion à la base de données
+        try{
+
+        await prisma.$connect();
+        console.log('✅ Connexion à la base de données réussie');
+
         this.app.listen(this.port, () => {
             console.log(`🚀 Serveur démarré sur le port ${this.port}`);
             console.log(`📍 Mode: ${process.env.NODE_ENV || 'development'}`);
@@ -187,7 +162,14 @@ class Server {
                 console.log(`🔧 Prisma Studio: npx prisma studio`);
             }
         });
+        }
+        catch (error) {
+            console.error('❌ Impossible de démarrer le serveur:', error);
+            process.exit(1);
+        }
+
     }
+    
 
     public getApp(): Application {
         return this.app;
@@ -198,7 +180,8 @@ class Server {
 const server = new Server();
 
 // Gestion gracieuse de l'arrêt
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
+    await prisma.$disconnect();
     console.log('\n🛑 Arrêt du serveur...');
     process.exit(0);
 });

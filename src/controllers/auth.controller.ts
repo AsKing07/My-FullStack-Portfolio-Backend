@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt, { SignOptions } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { asyncHandler, createError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
+import { generateTokens } from '../middleware/auth';
+
 
 const prisma = new PrismaClient();
 
@@ -19,34 +21,7 @@ interface RegisterData {
     password: string;
 }
 
-// Génération de tokens
-const generateTokens = (userId: string) => {
-const expiresInAccess: SignOptions['expiresIn'] =
-  (process.env.JWT_EXPIRES_IN ?? '24h') as SignOptions['expiresIn'];
 
-const expiresInRefresh: SignOptions['expiresIn'] =
-  (process.env.JWT_REFRESH_EXPIRES_IN ?? '7d') as SignOptions['expiresIn'];
-
-  
-  if (!expiresInAccess || !expiresInRefresh ) {
-    throw new Error('Les variables d’environnement JWT sont manquantes.');
-  }
-
-const accessToken = jwt.sign(
-    { id: userId },
-    process.env.JWT_SECRET as string,
-    { expiresIn: expiresInAccess }
-);
-
-const refreshToken = jwt.sign(
-    { id: userId },
-    process.env.JWT_REFRESH_SECRET as string,
-    { expiresIn: expiresInRefresh }
-);
-
-
-    return { accessToken, refreshToken };
-};
 
 // @desc    Inscription
 // @route   POST /api/auth/register
@@ -83,15 +58,15 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     });
 
     // Générer les tokens
-    const { accessToken, refreshToken } = generateTokens(user.id);
+    const token = generateTokens(user.id);
 
     res.status(201).json({
         success: true,
         message: 'Utilisateur créé avec succès',
         data: {
             user,
-            accessToken,
-            refreshToken
+            token: token.accessToken,
+            refreshToken: token.refreshToken
         }
     });
 });
@@ -119,7 +94,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     }
 
     // Générer les tokens
-    const { accessToken, refreshToken } = generateTokens(user.id);
+    const token = generateTokens(user.id);
 
     res.json({
         success: true,
@@ -131,11 +106,12 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
                 email: user.email,
                 role: user.role
             },
-            accessToken,
-            refreshToken
+            token: token.accessToken,
+            refreshToken: token.refreshToken
         }
     });
 });
+
 
 // @desc    Rafraîchir le token
 // @route   POST /api/auth/refresh
@@ -179,7 +155,7 @@ export const getProfile = asyncHandler(async (req: AuthRequest, res: Response) =
     const user = await prisma.user.findUnique({
         where: { id: req.user!.id },
         select: {
-            id: true,
+            id: true,         
             name: true,
             email: true,
             role: true,
@@ -191,7 +167,8 @@ export const getProfile = asyncHandler(async (req: AuthRequest, res: Response) =
             github: true,
             twitter: true,
             createdAt: true,
-            updatedAt: true
+            updatedAt: true,
+
         }
     });
 
@@ -242,5 +219,39 @@ export const updateProfile = asyncHandler(async (req: AuthRequest, res: Response
         success: true,
         message: 'Profil mis à jour avec succès',
         data: { user }
+    });
+});
+
+export const updatePassword = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+        throw createError('Mot de passe actuel et nouveau mot de passe requis', 400);
+    }
+    const user = await prisma.user.findUnique({
+        where: { id: req.user!.id }
+    });
+    if (!user) {
+        throw createError('Utilisateur non trouvé', 404);
+    }
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordValid) {
+        throw createError('Mot de passe actuel incorrect', 401);
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    const updatedUser = await prisma.user.update({
+        where: { id: req.user!.id },
+        data: { password: hashedPassword },
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            updatedAt: true
+        }
+    });
+    res.json({
+        success: true,
+        message: 'Mot de passe mis à jour avec succès',
+        data: { user: updatedUser }
     });
 });

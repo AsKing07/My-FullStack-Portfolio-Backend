@@ -150,7 +150,7 @@ model Experience {
   company     String
   location    String?
   description String?     @db.Text
-  technologies String?    @db.Text
+  technologies String?    @db.Text // Comma-separated list of technologies used
   type        ExpType     @default(FULLTIME)
   startDate   DateTime
   endDate     DateTime?

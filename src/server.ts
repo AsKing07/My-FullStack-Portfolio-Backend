@@ -7,11 +7,10 @@ import path from 'path';
 
 // Import des routes
 import authRoutes from './routes/auth.routes';
-// import userRoutes from './routes/user.routes';
 // import projectRoutes from './routes/project.routes';
  import categoryRoutes from './routes/category.routes';
  import skillRoutes from './routes/skills.routes';
-// import experienceRoutes from './routes/experience.routes';
+import experienceRoutes from './routes/experience.routes';
 // import educationRoutes from './routes/education.routes';
 // import contactRoutes from './routes/contact.routes';
 import blogRoutes from './routes/blog.routes';
@@ -126,11 +125,11 @@ class Server {
 
         // Routes API
         this.app.use('/api/auth', authRoutes);
-        // this.app.use('/api/users', userRoutes);
+
         // this.app.use('/api/projects', projectRoutes);
         this.app.use('/api/categories', categoryRoutes);
         this.app.use('/api/skills', skillRoutes);
-        // this.app.use('/api/experiences', experienceRoutes);
+        this.app.use('/api/experiences', experienceRoutes);
         // this.app.use('/api/educations', educationRoutes);
         // this.app.use('/api/contacts', contactRoutes);
         this.app.use('/api/blog', blogRoutes);

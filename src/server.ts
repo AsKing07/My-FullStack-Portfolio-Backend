@@ -12,7 +12,7 @@ import categoryRoutes from './routes/category.routes';
 import skillRoutes from './routes/skills.routes';
 import experienceRoutes from './routes/experience.routes';
 import educationRoutes from './routes/education.routes';
-// import contactRoutes from './routes/contact.routes';
+import contactRoutes from './routes/contact.routes';
 import blogRoutes from './routes/blog.routes';
 // import uploadRoutes from './routes/upload.routes';
 import githubRoutes from './routes/github.routes';
@@ -131,7 +131,7 @@ class Server {
         this.app.use('/api/skills', skillRoutes);
         this.app.use('/api/experiences', experienceRoutes);
         this.app.use('/api/educations', educationRoutes);
-        // this.app.use('/api/contacts', contactRoutes);
+        this.app.use('/api/contacts', contactRoutes);
         this.app.use('/api/blog', blogRoutes);
         // this.app.use('/api/uploads', uploadRoutes);
         this.app.use('/api/github', githubRoutes);

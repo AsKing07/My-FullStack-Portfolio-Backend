@@ -219,6 +219,10 @@ exports.createPost = asyncHandler(async (req: AuthRequest, res: Response) => {
         throw createError('Titre, slug et contenu sont requis', 400);
     }
 
+    if (typeof status !== 'string' || !['DRAFT', 'PUBLISHED', 'ARCHIVED'].includes(status)) {
+        throw createError('Statut invalide, doit être DRAFT, PUBLISHED ou ARCHIVED', 400);
+    }
+
     let imageUrl: string | undefined;
     if (req.file) {
         imageUrl = await saveImage(req.file, 'blog');

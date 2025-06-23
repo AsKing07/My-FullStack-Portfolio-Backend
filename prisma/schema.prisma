@@ -87,7 +87,7 @@ model Category {
   slug        String      @unique
   description String?
   color       String?
-  icon        String?
+  icon        String? //FontAwesome class
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
@@ -132,7 +132,7 @@ model Skill {
   level       SkillLevel  @default(INTERMEDIATE)
   yearsExp    Int?
   description String?
-  icon        String?
+  icon        String? //FontAwesome class
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 

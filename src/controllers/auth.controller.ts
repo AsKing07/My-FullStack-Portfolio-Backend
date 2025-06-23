@@ -97,11 +97,14 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     // Générer les tokens
     const token = generateTokens(user.id);
 
+    // Exclure le mot de passe de la réponse utilisateur
+    const { password: _, ...userWithoutPassword } = user;
+
     res.json({
         success: true,
         message: 'Connexion réussie',
         data: {
-            user: user,
+            user: userWithoutPassword,
             token: token.accessToken,
             refreshToken: token.refreshToken
         }

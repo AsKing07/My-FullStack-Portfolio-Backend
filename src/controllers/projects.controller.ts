@@ -121,6 +121,7 @@ export const createProject = asyncHandler(async (req: AuthRequest, res: Response
         userId: req.user!.id,
         slug: req.body.slug || generateSlug(req.body.title)
     };
+    
 
     const project = await prisma.project.create({
         data: projectData,

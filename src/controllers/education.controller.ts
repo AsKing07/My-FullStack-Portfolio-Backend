@@ -124,6 +124,10 @@ export const updateEducation = asyncHandler(async (req: AuthRequest, res: Respon
     if (endDate && !startDate && !education.startDate) {
         throw createError('La date de début est requise si une date de fin est fournie', 400);
     }
+    if(endDate && !startDate && new Date(endDate) < new Date(education.startDate))
+    {
+        throw createError('La date de fin ne peut pas être antérieure à la date de début', 400);
+    }
     if (endDate && new Date(endDate) < new Date(startDate)) {
         throw createError('La date de fin ne peut pas être antérieure à la date de début', 400);
     }

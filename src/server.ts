@@ -7,7 +7,7 @@ import path from 'path';
 
 // Import des routes
 import authRoutes from './routes/auth.routes';
-// import projectRoutes from './routes/project.routes';
+import projectRoutes from './routes/projects.routes';
 import categoryRoutes from './routes/category.routes';
 import skillRoutes from './routes/skills.routes';
 import experienceRoutes from './routes/experience.routes';
@@ -126,7 +126,7 @@ class Server {
         // Routes API
         this.app.use('/api/auth', authRoutes);
 
-        // this.app.use('/api/projects', projectRoutes);
+        this.app.use('/api/projects', projectRoutes);
         this.app.use('/api/categories', categoryRoutes);
         this.app.use('/api/skills', skillRoutes);
         this.app.use('/api/experiences', experienceRoutes);

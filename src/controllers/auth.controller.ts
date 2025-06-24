@@ -6,6 +6,7 @@ import { asyncHandler, createError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
 import { generateTokens } from '../middleware/auth';
 import { deleteImage, deletePdf, saveImage, savePdf } from '@/utils/saveFile_utils';
+import { it } from 'node:test';
 
 
 const prisma = new PrismaClient();
@@ -64,11 +65,9 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     res.status(201).json({
         success: true,
         message: 'Utilisateur créé avec succès',
-        data: {
-            user,
+         user,
             token: token.accessToken,
             refreshToken: token.refreshToken
-        }
     });
 });
 
@@ -103,11 +102,9 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     res.json({
         success: true,
         message: 'Connexion réussie',
-        data: {
-            user: userWithoutPassword,
+      user: userWithoutPassword,
             token: token.accessToken,
             refreshToken: token.refreshToken
-        }
     });
 });
 
@@ -137,10 +134,9 @@ export const refreshToken = asyncHandler(async (req: Request, res: Response) => 
 
         res.json({
             success: true,
-            data: {
-                accessToken,
-                refreshToken: newRefreshToken
-            }
+             accessToken,
+                refreshToken: newRefreshToken,
+                user: user
         });
     } catch (error) {
         throw createError('Refresh token invalide', 401);
@@ -155,7 +151,9 @@ export const getUser = asyncHandler(async (req: AuthRequest, res: Response) => {
 
     res.json({
         success: true,
-        data: { user }
+        data:  {
+            items: user
+        }
     });
 });
 
@@ -183,7 +181,9 @@ export const getUserPublic = asyncHandler(async (req: AuthRequest, res: Response
 
     res.json({
         success: true,
-        data: { user }
+        data:  {
+            items: user
+        } 
     });
 });
 
@@ -235,7 +235,7 @@ export const updateUser = asyncHandler(async (req: AuthRequest, res: Response) =
     res.json({
         success: true,
         message: 'Profil mis à jour avec succès',
-        data: { user: updateUser }
+        data: { items: updateUser }
     });
 });
 
@@ -267,7 +267,7 @@ export const updateResume = asyncHandler(async (req: AuthRequest, res: Response)
     res.json({
         success: true,
         message: 'CV mis à jour avec succès',
-        data: { resume: updateCv.resumeUrl }
+        data: { items: updateCv.resumeUrl }
     });
 });
 
@@ -305,7 +305,7 @@ export const updatePassword = asyncHandler(async (req: AuthRequest, res: Respons
     res.json({
         success: true,
         message: 'Mot de passe mis à jour avec succès',
-        data: { user: updatedUser }
+        data: { items: updatedUser }
     });
 });
 

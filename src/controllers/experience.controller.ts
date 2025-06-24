@@ -27,9 +27,9 @@ export const getExperiences = asyncHandler(async (req: Request, res: Response) =
     ]);
 
     res.status(200).json({
-        status: 'success',
+        success: true,
         data: {
-            experiences,
+         items:   experiences,
             pagination: {
                 page: pageNum,
                 limit: limitNum,
@@ -56,7 +56,9 @@ export const getExperienceById = asyncHandler(async (req: Request, res: Response
 
     if (!experience) throw createError('Expérience non trouvée', 404);
 
-    res.status(200).json({ status: 'success', data: experience });
+    res.status(200).json({ success: true, data: {
+        items: experience
+    } });
 });
 
 /**
@@ -103,7 +105,9 @@ export const createExperience = asyncHandler(async (req: AuthRequest, res: Respo
         }
     });
 
-    res.status(201).json({ status: 'success', data: experience });
+    res.status(201).json({ success: true, data: {
+        items: experience
+    } });
 });
 
 /**
@@ -155,7 +159,9 @@ export const updateExperience = asyncHandler(async (req: AuthRequest, res: Respo
 
     res.status(200).json({ 
         message: 'Expérience mise à jour avec succès',
-        status: 'success', data: updated });
+        success: true, data: {
+            items: updated
+        } });
 });
 
 /**

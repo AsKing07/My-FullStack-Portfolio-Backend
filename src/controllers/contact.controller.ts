@@ -33,7 +33,7 @@ export const getContacts = asyncHandler(async (req: AuthRequest, res: Response) 
     res.json({
         success: true,
         data: {
-            contacts,
+          items:  contacts,
             pagination: {
                 page: pageNum,
                 limit: limitNum,
@@ -56,7 +56,9 @@ export const getContactById = asyncHandler(async (req: AuthRequest, res: Respons
     const contact = await prisma.contact.findUnique({ where: { id } });
     if (!contact) throw createError('Message non trouvé', 404);
 
-    res.json({ success: true, data: contact });
+    res.json({ success: true, data: {
+        items: contact
+    } });
 });
 
 /**
@@ -86,7 +88,9 @@ export const createContact = asyncHandler(async (req: Request, res: Response) =>
     res.status(201).json({
         success: true,
         message: 'Message envoyé avec succès',
-        data: contact
+        data: {
+            items: contact
+        }
     });
 });
 
@@ -110,7 +114,9 @@ export const markAsRead = asyncHandler(async (req: AuthRequest, res: Response) =
     res.json({
         success: true,
         message: 'Message marqué comme lu',
-        data: updated
+        data: {
+            items: updated
+        }
     });
 });
 

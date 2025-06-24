@@ -27,9 +27,9 @@ export const getEducations = asyncHandler(async (req: Request, res: Response) =>
     ]);
 
     res.status(200).json({
-        status: 'success',
+        success: true,
         data: {
-            educations,
+           items: educations,
             pagination: {
                 page: pageNum,
                 limit: limitNum,
@@ -56,7 +56,7 @@ export const getEducationById = asyncHandler(async (req: Request, res: Response)
 
     if (!education) throw createError('Formation non trouvée', 404);
 
-    res.status(200).json({ status: 'success', data: education });
+    res.status(200).json({ success: true, data: {items:education} });
 });
 
 /**
@@ -97,7 +97,7 @@ export const createEducation = asyncHandler(async (req: AuthRequest, res: Respon
         }
     });
 
-    res.status(201).json({ status: 'success', data: education });
+    res.status(201).json({ success: true, data: {items:education} });
 });
 
 /**
@@ -147,7 +147,7 @@ export const updateEducation = asyncHandler(async (req: AuthRequest, res: Respon
         }
     });
 
-    res.status(200).json({message:"Education modifiée avec succès",  status: 'success', data: updated });
+    res.status(200).json({message:"Education modifiée avec succès",  success: true, data: {items:updated} });
 });
 
 /**
@@ -165,5 +165,5 @@ export const deleteEducation = asyncHandler(async (req: AuthRequest, res: Respon
     // if (education.userId !== req.user!.id) throw createError('Non autorisé', 403);
 
     await prisma.education.delete({ where: { id } });
-    res.status(204).json({ status: 'success' });
+    res.status(204).json({ success: true });
 });

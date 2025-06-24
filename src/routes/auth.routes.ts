@@ -58,5 +58,6 @@ router.get('/userByAdmin', authenticate, getUser);
 
 router.put('/user', authenticate, validate(updateProfileSchema), uploadMiddleware('avatar'), updateUser);
 router.put('/user/resume', authenticate, uploadPdfMiddleware('resume'), updateResume);
+router.put('/password', authenticate, updatePassword);
 
 export default router;

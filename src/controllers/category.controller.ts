@@ -24,9 +24,10 @@ export const getCategories = asyncHandler(async (req: Request, res: Response) =>
     ]);
 
     res.status(200).json({
-        status: 'success',
+        success: true,
+        
         data: {
-            categories,
+           items: categories,
             pagination: {
                 page: pageNum,
                 limit: limitNum,
@@ -59,8 +60,8 @@ export const getCategoryBySlug = asyncHandler(async (req: Request, res: Response
     }
 
     res.status(200).json({
-        status: 'success',
-        data: { category }
+        success: true,
+        data: { items:category }
     });
 });
 
@@ -104,8 +105,8 @@ export const createCategory = asyncHandler(async (req: AuthRequest, res: Respons
     });
 
     res.status(201).json({
-        status: 'success',
-        data: { category: newCategory }
+        success: true,
+        data: { items: newCategory }
     });
 
 });
@@ -152,8 +153,8 @@ export const updateCategory = asyncHandler(async (req: AuthRequest, res: Respons
         }
     });
     res.status(200).json({
-        status: 'success',
-        data: { category: updatedCategory }
+        success: true,
+        data: { items: updatedCategory }
     });
 });
 
@@ -178,7 +179,7 @@ export const deleteCategory = asyncHandler(async (req: AuthRequest, res: Respons
         where: { id }
     });
     res.status(200).json({
-        status: 'success',
+        success: true,
         message: 'Catégorie supprimée avec succès'
     });
 });

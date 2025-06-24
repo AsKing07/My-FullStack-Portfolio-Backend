@@ -94,7 +94,7 @@ class Server {
         // Health check
         this.app.get('/health', (req: Request, res: Response) => {
             res.status(200).json({
-                status: 'OK',
+                success: 'OK',
                 timestamp: new Date().toISOString(),
                 uptime: process.uptime(),
                 environment: process.env.NODE_ENV,

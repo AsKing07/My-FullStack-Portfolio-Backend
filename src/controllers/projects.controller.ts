@@ -51,7 +51,7 @@ export const getProjects = asyncHandler(async (req: Request, res: Response) => {
     res.json({
         success: true,
         data: {
-            projects,
+          items:  projects,
             pagination: {
                 page: pageNum,
                 limit: limitNum,
@@ -81,7 +81,7 @@ export const getProject = asyncHandler(async (req: Request, res: Response) => {
 
     res.json({
         success: true,
-        data: { project }
+        data: { items: project }
     });
 });
 
@@ -134,7 +134,7 @@ export const createProject = asyncHandler(async (req: AuthRequest, res: Response
     res.status(201).json({
         success: true,
         message: 'Projet créé avec succès',
-        data: { project }
+        data: { items:project }
     });
 });
 
@@ -195,7 +195,7 @@ export const updateProject = asyncHandler(async (req: AuthRequest, res: Response
     res.json({
         success: true,
         message: 'Projet mis à jour avec succès',
-        data: { project: updatedProject }
+        data: { items: updatedProject }
     });
 });
 

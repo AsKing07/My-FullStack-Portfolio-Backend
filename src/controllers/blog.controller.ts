@@ -78,9 +78,9 @@ exports.getPosts = asyncHandler(async (req: Request, res: Response)=>{
     ]);
 
     res.status(200).json({
-        status: 'success',
+        success: true,
         data:{
-            posts,
+            items: posts,
             pagination:{
                 page: pageNum, 
                 limit: limitNum,
@@ -150,9 +150,9 @@ exports.getPostsAdmin = asyncHandler(async (req: AuthRequest, res: Response) => 
         prisma.blogPost.count({ where })
     ]);
     res.status(200).json({
-        status: 'success',
+        success: true,
         data: {
-            posts,
+            items:posts,
             pagination: {
                 page: pageNum,
                 limit: limitNum,
@@ -202,8 +202,10 @@ exports.getPostBySlug = asyncHandler(async (req: Request, res: Response) => {
         throw createError('Article non trouvé', 404);
     }
     res.status(200).json({
-        status: 'success',
-        data: post
+        success: true,
+        data: {
+            items: post
+        }
     });
 });
 
@@ -258,9 +260,11 @@ exports.createPost = asyncHandler(async (req: AuthRequest, res: Response) => {
         }
     });
     res.status(201).json({
-        status: 'success',
+        success: true,
         message: 'Article créé avec succès',
-        data: post
+        data: {
+            items: post
+        }
     });
 });
 
@@ -326,9 +330,11 @@ exports.updatePost = asyncHandler(async (req: AuthRequest, res: Response) => {
     });
 
     res.status(200).json({
-        status: 'success',
+        success: true,
         message: 'Article mis à jour avec succès',
-        data: updatedPost
+        data: {
+            items: updatedPost
+        }
     });
 });
 
@@ -361,7 +367,7 @@ exports.deletePost = asyncHandler(async (req: AuthRequest, res: Response) => {
     });
 
     res.status(200).json({
-        status: 'success',
+        success: true,
         message: 'Article supprimé avec succès'
     });
 });

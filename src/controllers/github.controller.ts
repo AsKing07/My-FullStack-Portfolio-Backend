@@ -14,7 +14,12 @@ export const getGithubStatsController = asyncHandler(async (req: Request, res: R
         }
 
         const stats = await getGithubStats(username);
-        res.status(200).json(stats);
+         res.status(200).json({
+            status: "success",
+            data: {
+                items: stats
+            }
+         });
     }
     catch (error) {
         throw createError("Error lors de la récupération des statis", 500);
@@ -33,7 +38,12 @@ export const getGithubProfileController = asyncHandler(async (req: Request, res:
         }
 
         const profile = await getGithubProfile(username);
-        res.status(200).json(profile);
+        res.status(200).json({
+            status: "success",
+            data: {
+                items: profile
+            }
+        });
     } catch (error) {
         throw createError("Error lors de la récupération du profil GitHub", 500);
     }
@@ -59,7 +69,12 @@ export const getGithubReposController = asyncHandler(async (req: Request, res: R
         };
 
         const repos = await getGithubRepos(username, options);
-        res.status(200).json(repos);
+        res.status(200).json({
+            status: "success",
+            data: {
+                items: repos
+            }
+        });
     } catch (error) {
         throw createError("Error lors de la récupération des dépôts GitHub", 500);
     }

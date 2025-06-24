@@ -44,9 +44,9 @@ exports.getSkills = asyncHandler(async (req: Request, res: Response) => {
     ]);
 
     res.status(200).json({
-        status: 'success',
+        success: true,
         data: {
-            skills,
+           items: skills,
             pagination: {
                 page: pageNum,
                 limit: limitNum,
@@ -81,9 +81,9 @@ exports.getSkill = asyncHandler(async (req: Request, res: Response) => {
     }
 
     res.status(200).json({
-        status: 'success',
+        success: true,
         data: {
-            skill
+           items: skill
         }
     });
 });
@@ -131,9 +131,9 @@ exports.addSkill = asyncHandler(async (req: AuthRequest, res: Response) => {
 
     res.status(201).json({
         message: 'Compétence ajoutée avec succès',
-        status: 'success',
+        success: true,
         data: {
-            skill
+           item:  skill
         }
     });
 });
@@ -194,9 +194,9 @@ exports.updateSkill = asyncHandler(async (req: AuthRequest, res: Response) => {
 
     res.status(200).json({
         message: 'Compétence mise à jour avec succès',
-        status: 'success',
+        success: true,
         data: {
-            skill: updatedSkill
+            items: updatedSkill
         }
     });
 
@@ -228,7 +228,7 @@ exports.deleteSkill = asyncHandler(async (req: AuthRequest, res: Response) => {
 
     res.status(200).json({
         message: 'Compétence supprimée avec succès',
-        status: 'success'
+        success: true
     });
 });
 

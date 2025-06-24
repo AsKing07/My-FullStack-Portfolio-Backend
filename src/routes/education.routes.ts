@@ -1,16 +1,16 @@
 import express from 'express';
-import { getExperiences, getExperienceById, createExperience, updateExperience, deleteExperience } from '../controllers/experience.controller';
+import { getEducations, getEducationById, createEducation, updateEducation, deleteEducation } from '@/controllers/education.controller';
 import { authenticate } from '../middleware/auth';
 
 const router = express.Router();
 
 // Routes publiques
-router.get('/', getExperiences);
-router.get('/:id', getExperienceById);
+router.get('/', getEducations);
+router.get('/:id', getEducationById);
 
 // Routes protégées
-router.post('/', authenticate, createExperience);
-router.put('/:id', authenticate, updateExperience);
-router.delete('/:id', authenticate, deleteExperience);
+router.post('/', authenticate, createEducation);
+router.put('/:id', authenticate, updateEducation);
+router.delete('/:id', authenticate, deleteEducation);
 
 export default router;

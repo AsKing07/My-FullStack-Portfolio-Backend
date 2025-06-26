@@ -19,6 +19,9 @@ enum ProjectStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
+      IN_PROGRESS
+    PLANNED
+    COMPLETED
 }
 
 enum PostStatus {

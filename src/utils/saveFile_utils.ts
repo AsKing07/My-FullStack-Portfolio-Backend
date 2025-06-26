@@ -1,3 +1,4 @@
+require('dotenv').config(); 
 import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
@@ -15,7 +16,7 @@ export const saveImage = async (file: Express.Multer.File, entity: string): Prom
         throw createError('Aucun fichier fourni', 400);
     }
 
-    const uploadDir = path.join(__dirname, '..', 'uploads', entity);
+    const uploadDir = path.join(process.cwd(), 'uploads', entity);
     if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
     }
@@ -79,6 +80,7 @@ export const upload = multer({
  * @param param  Nom du champ (ex: 'image')
  */
 export const uploadMiddleware = (param: string) => upload.single(param);
+export const uploadImagesMiddleware =(param: string) => upload.array(param, 10); // 10 = nombre max de fichiers
 
 
 /**
@@ -92,7 +94,7 @@ export const savePdf = async (file: Express.Multer.File, entity: string): Promis
         throw createError('Aucun fichier fourni', 400);
     }
 
-    const uploadDir = path.join(__dirname, '..', 'uploads', entity);
+    const uploadDir = path.join(process.cwd(), 'uploads', entity); // <-- correction ici aussi
     if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
     }

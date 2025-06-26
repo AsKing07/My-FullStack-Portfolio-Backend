@@ -175,6 +175,7 @@ export const getUserPublic = asyncHandler(async (req: AuthRequest, res: Response
             github: true,
             twitter: true,
             phone: true,
+            resumeUrl: true
         }
 
     });

@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { PrismaClient, ProjectStatus } from '@prisma/client';
 import { asyncHandler, createError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
+import { saveImage } from '@/utils/saveFile_utils';
+import { stat } from 'fs';
 
 const prisma = new PrismaClient();
 
@@ -11,8 +13,8 @@ export const getProjects = asyncHandler(async (req: Request, res: Response) => {
         page = '1',
         limit = '10',
         category,
-        featured,
-        status = 'PUBLISHED'
+        featured
+       
     } = req.query;
 
     const pageNum = parseInt(page as string, 10);
@@ -20,7 +22,7 @@ export const getProjects = asyncHandler(async (req: Request, res: Response) => {
     const skip = (pageNum - 1) * limitNum;
 
     const where: any = {
-        status: status as ProjectStatus
+  status: 'PUBLISHED' 
     };
 
     if (category) {
@@ -62,20 +64,80 @@ export const getProjects = asyncHandler(async (req: Request, res: Response) => {
     });
 });
 
+// GET /api/projects/all
+//private route to get all projects, used by admin
+export const getAllProjects = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const {
+        page = '1',
+        limit = '10',
+        category,
+        featured
+    } = req.query;
+    const pageNum = parseInt(page as string, 10);
+    const limitNum = parseInt(limit as string, 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    const where: any = {
+        userId: req.user!.id
+    };
+
+    if (category) {
+        where.category = { slug: category };
+    }
+    if (featured === 'true') {
+        where.featured = true;
+    }
+
+    const [projects, total] = await Promise.all([
+        prisma.project.findMany({
+            where,
+            include: {
+                category: { select: { id: true, name: true, slug: true, color: true } },
+                user: { select: { name: true, avatarUrl: true } }
+            },
+            orderBy: [
+                { featured: 'desc' },
+                { priority: 'desc' },
+                { createdAt: 'desc' }
+            ],
+            skip,
+            take: limitNum
+        }),
+        prisma.project.count({ where })
+    ]);
+
+    res.json({
+        success: true,
+        data: {
+          items:  projects,
+            pagination: {
+                page: pageNum,
+                limit: limitNum,
+                total,
+                pages: Math.ceil(total / limitNum)
+            }
+        }
+    });
+});
+
+
+//
+
 // GET /api/projects/:slug
 export const getProject = asyncHandler(async (req: Request, res: Response) => {
     const { slug } = req.params;
     if (!slug) throw createError('Slug manquant', 400);
 
+    console.log('slug', slug);
     const project = await prisma.project.findUnique({
-        where: { slug },
+        where: { slug: slug },
         include: {
             category: true,
             user: { select: { name: true, avatarUrl: true } }
         }
     });
 
-    if (!project || project.status !== 'PUBLISHED') {
+    if (!project ) {
         throw createError('Projet non trouvé', 404);
     }
 
@@ -84,6 +146,43 @@ export const getProject = asyncHandler(async (req: Request, res: Response) => {
         data: { items: project }
     });
 });
+
+//Post /api/projects/images
+export const uploadProjectImages = asyncHandler(async (req: AuthRequest, res: Response) => {
+    if (!req.file && !req.files) {
+        throw createError('Aucun fichier image fourni', 400);
+    }
+    if(req.file)
+    {
+        const imageUrl = await saveImage(req.file, 'projects');
+        res.json({
+            success: true,
+            message: 'Image téléchargée avec succès',
+            data: { items: imageUrl }
+        });
+    }
+    else if(req.files)
+    {
+        const imagesUrls = [];
+        let filesArray: any[] = [];
+        if (Array.isArray(req.files)) {
+            filesArray = req.files;
+        } else if (typeof req.files === 'object' && req.files !== null) {
+            // req.files is an object: { fieldname: File[] }
+            filesArray = Object.values(req.files).flat();
+        }
+        for (const file of filesArray) {
+            const imageUrl = await saveImage(file, 'projects');
+            imagesUrls.push(imageUrl);
+        }
+        res.json({
+            success: true,
+            message: 'Images téléchargées avec succès',
+            data: { items: imagesUrls }
+        });
+    }
+
+})
 
 // POST /api/projects
 export const createProject = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -217,6 +316,27 @@ export const deleteProject = asyncHandler(async (req: AuthRequest, res: Response
         message: 'Projet supprimé avec succès'
     });
 });
+
+// Bulk delete projects
+export const bulkDeleteProjects = asyncHandler(async (req: AuthRequest, res: Response)  => {
+    const { ids } = req.body;
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        throw createError('Aucun ID fourni', 400);
+    }
+    const deletedProjects = await prisma.project.deleteMany({
+        where: {
+            id: { in: ids }
+        }
+    });
+    res.json({
+        success: true,
+        message: `${deletedProjects.count} projets supprimés avec succès`,
+        data: { items: deletedProjects }
+    });
+});
+
+
+
 
 // Génération de slug
 const generateSlug = (title: string): string => {

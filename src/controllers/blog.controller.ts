@@ -50,11 +50,12 @@ exports.getPosts = asyncHandler(async (req: Request, res: Response)=>{
             readingTime: true,
             createdAt: true,
             updatedAt: true,
+            publishedAt: true,
             user: {
                 select: {
                     id: true,
                     name: true,
-                    avatar: true
+                    avatarUrl: true
                 }
             }
         },
@@ -113,6 +114,8 @@ exports.getPostsAdmin = asyncHandler(async (req: AuthRequest, res: Response) => 
     } else if (typeof published === 'string' && published.toLowerCase() === 'published') {
         where.status = 'PUBLISHED';
     }
+    console.log('where', where);
+    
     const pageNum = parseInt(page as string);
     const limitNum = parseInt(limit as string);
     const skip = (pageNum - 1) * limitNum;
@@ -134,7 +137,8 @@ exports.getPostsAdmin = asyncHandler(async (req: AuthRequest, res: Response) => 
             image: true,
             readingTime: true,
             createdAt: true,
-            updatedAt: true
+            updatedAt: true,
+            publishedAt: true,
         },
         take: limitNum,
         skip: skip
@@ -189,11 +193,12 @@ exports.getPostBySlug = asyncHandler(async (req: Request, res: Response) => {
             readingTime: true,
             createdAt: true,
             updatedAt: true,
+            publishedAt: true,
             user: {
                 select: {
                     id: true,
                     name: true,
-                    avatar: true
+                    avatarUrl: true
                 }
             }
         }
@@ -250,13 +255,7 @@ exports.createPost = asyncHandler(async (req: AuthRequest, res: Response) => {
             readingTime: true,
             createdAt: true,
             updatedAt: true,
-            user: {
-                select: {
-                    id: true,
-                    name: true,
-                    avatar: true
-                }
-            }
+            
         }
     });
     res.status(201).json({
@@ -267,6 +266,63 @@ exports.createPost = asyncHandler(async (req: AuthRequest, res: Response) => {
         }
     });
 });
+
+/**
+ * @desc Publie un article
+ * @route PUT /api/blog/:id/publish
+ *  @access Private (Admin Only)
+ */
+exports.publishPost = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    if (!id) {
+        throw createError('ID manquant', 400);
+    }
+
+    const post = await prisma.blogPost.findUnique({
+        where: { id }
+    });
+
+    if (!post) {
+        throw createError('Article non trouvé', 404);
+    }
+
+    if (post.status === 'PUBLISHED') {
+        throw createError('L\'article est déjà publié', 400);
+    }
+
+    const updatedPost = await prisma.blogPost.update({
+        where: { id },
+        data: {
+            status: 'PUBLISHED',
+            publishedAt: new Date()
+        },
+        select: {
+            id: true,
+            title: true,
+            slug: true,
+            excerpt: true,
+            content: true,
+            status: true,
+            featured: true,
+            metaTitle: true,
+            metaDesc: true,
+            image: true,
+            readingTime: true,
+            createdAt: true,
+            updatedAt: true,
+
+        }
+    });
+
+    res.status(200).json({
+        success: true,
+        message: 'Article publié avec succès',
+        data: {
+            items: updatedPost
+        }
+    });
+});
+
 
 /**
  * @desc Met à jour un article
@@ -319,13 +375,7 @@ exports.updatePost = asyncHandler(async (req: AuthRequest, res: Response) => {
             readingTime: true,
             createdAt: true,
             updatedAt: true,
-            user: {
-                select: {
-                    id: true,
-                    name: true,
-                    avatar: true
-                }
-            }
+           
         }
     });
 
@@ -337,6 +387,7 @@ exports.updatePost = asyncHandler(async (req: AuthRequest, res: Response) => {
         }
     });
 });
+
 
 /**
  * @desc Supprime un article

@@ -4,9 +4,10 @@
   "description": "",
   "main": "server.ts,",
   "scripts": {
-    "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/server.ts",
+"dev": "nodemon --exec ts-node -r tsconfig-paths/register src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
+    "postinstall": "npm run build && npx prisma generate",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write src/**/*.ts",

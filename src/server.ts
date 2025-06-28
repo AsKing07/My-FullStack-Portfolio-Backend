@@ -85,7 +85,7 @@ class Server {
         this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
         // Servir les fichiers statiques
-        this.app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+        this.app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
         // Logger des requêtes (en développement)
         if (process.env.NODE_ENV === 'development') {
@@ -111,15 +111,15 @@ class Server {
                 version: '1.0.0',
                 endpoints: {
                     auth: '/api/auth',
-                    // users: '/api/users',
-                    // projects: '/api/projects',
-                    // categories: '/api/categories',
-                    // skills: '/api/skills',
-                    // experiences: '/api/experiences',
-                    // educations: '/api/educations',
-                    // contacts: '/api/contacts',
-                    // blog: '/api/blog',
-                    // uploads: '/api/uploads',
+                    users: '/api/users',
+                    projects: '/api/projects',
+                    categories: '/api/categories',
+                    skills: '/api/skills',
+                    experiences: '/api/experiences',
+                    educations: '/api/educations',
+                    contacts: '/api/contacts',
+                    blog: '/api/blog',
+                    uploads: '/api/uploads',
                 }
             });
         });

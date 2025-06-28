@@ -6,7 +6,6 @@ import { asyncHandler, createError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
 import { generateTokens } from '../middleware/auth';
 import { deleteImage, deletePdf, saveImage, savePdf } from '@/utils/saveFile_utils';
-import { it } from 'node:test';
 
 
 const prisma = new PrismaClient();

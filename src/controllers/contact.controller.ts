@@ -85,6 +85,46 @@ export const createContact = asyncHandler(async (req: Request, res: Response) =>
         }
     });
 
+    // Envoyer une notification email à toi-même
+    try {
+        const transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port: Number(process.env.SMTP_PORT),
+            secure: false,
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS
+            }
+        });
+
+        const emailContent = `
+Nouveau message de contact reçu !
+
+📧 De: ${name} (${email})
+${phone ? `📱 Téléphone: ${phone}` : ''}
+${company ? `🏢 Entreprise: ${company}` : ''}
+${website ? `🌐 Site web: ${website}` : ''}
+📝 Sujet: ${subject || 'Aucun sujet'}
+
+💬 Message:
+${message}
+
+---
+Envoyé depuis votre portfolio
+Date: ${new Date().toLocaleString('fr-FR')}
+        `;
+
+        await transporter.sendMail({
+            from: process.env.SMTP_USER,
+            to: process.env.CONTACT_EMAIL, // ou process.env.SMTP_USER
+            subject: `🔔 Nouveau message de contact - ${name}`,
+            text: emailContent
+        });
+    } catch (emailError) {
+        // Log l'erreur mais ne pas faire échouer la création du contact
+        console.error('Erreur lors de l\'envoi de la notification email:', emailError);
+    }
+
     res.status(201).json({
         success: true,
         message: 'Message envoyé avec succès',
@@ -146,7 +186,8 @@ export const replyToContact = asyncHandler(async (req: AuthRequest, res: Respons
 
     // Envoyer l'email
     await transporter.sendMail({
-        from: process.env.CONTACT_EMAIL || process.env.SMTP_USER,
+        from: process.env.CONTACT_EMAIL,
+        replyTo: process.env.CONTACT_EMAIL,
         to: contact.email,
         subject: `Réponse à votre message${contact.subject ? ' : ' + contact.subject : ''}`,
         text: reply

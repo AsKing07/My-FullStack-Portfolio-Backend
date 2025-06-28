@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const { asyncHandler, createError } = require('../middleware/errorHandler');
+import { SkillLevel } from '@prisma/client';
 import { AuthRequest } from '../middleware/auth';
 import { Request, Response } from 'express';
 
@@ -100,12 +101,15 @@ exports.addSkill = asyncHandler(async (req: AuthRequest, res: Response) => {
         throw createError('Le champs nom est obligatoire', 400);
     }
 
-    if(level && ['BEGINNER', 'INTERMEDIATE', 'ADVANCED', 'EXPERT'].indexOf(level.toUpperCase()) === -1) {
+    if(level && !Object.values(SkillLevel).includes(level.toUpperCase())) {
         throw createError('Niveau invalide. Veuillez choisir entre BEGINNER, INTERMEDIATE, ADVANCED ou EXPERT', 400);
     }
-
-    const existingSkill = await prisma.skill.findUnique({
-        where: { [name.toLowerCase()]: name.toLowerCase() }
+    const existingSkill = await prisma.skill.findFirst({
+        where: {
+            name: {
+                equals: name
+            }
+        }
     });
 
     if (existingSkill) {
@@ -160,16 +164,21 @@ exports.updateSkill = asyncHandler(async (req: AuthRequest, res: Response) => {
     }
 
     if (name && name.toLowerCase() !== skill.name.toLowerCase()) {
-        const existingSkill = await prisma.skill.findUnique({
-            where: { name: name.toLowerCase() }
-        });
+        const  existingSkill = await prisma.skill.findFirst({
+        where: {
+            name: {
+                equals: name,
+                mode: 'insensitive'
+            }
+        }
+    });
 
         if (existingSkill) {
             throw createError('Une compétence avec ce nom existe déjà', 400);
         }
     }
 
-    if( level && ['BEGINNER', 'INTERMEDIATE', 'ADVANCED', 'EXPERT'].indexOf(level.toUpperCase()) === -1) {
+    if(level && !Object.values(SkillLevel).includes(level.toUpperCase())) {
         throw createError('Niveau invalide. Veuillez choisir entre BEGINNER, INTERMEDIATE, ADVANCED ou EXPERT', 400);
     }
 

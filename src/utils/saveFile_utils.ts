@@ -42,8 +42,8 @@ export const deleteImage = async (url: string): Promise<void> => {
         if (uploadsIndex === -1) {
             throw createError('URL invalide pour la suppression', 400);
         }
-        const relativePath = url.substring(uploadsIndex + 1); // retire le slash initial
-        const filePath = path.join(__dirname, '..', relativePath);
+    const relativePath = url.substring(uploadsIndex + 1); // retire le slash initial
+        const filePath = path.join(process.cwd(), relativePath);
 
         // Vérifier si le fichier existe
         if (!fs.existsSync(filePath)) {
@@ -94,7 +94,7 @@ export const savePdf = async (file: Express.Multer.File, entity: string): Promis
         throw createError('Aucun fichier fourni', 400);
     }
 
-    const uploadDir = path.join(process.cwd(), 'uploads', entity); // <-- correction ici aussi
+    const uploadDir = path.join(process.cwd(), 'uploads', entity); 
     if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
     }
@@ -121,7 +121,7 @@ export const deletePdf = async (url: string): Promise<void> => {
             throw createError('URL invalide pour la suppression', 400);
         }
         const relativePath = url.substring(uploadsIndex + 1); // retire le slash initial
-        const filePath = path.join(__dirname, '..', relativePath);
+        const filePath = path.join(process.cwd(), relativePath);
 
         // Vérifier si le fichier existe
         if (!fs.existsSync(filePath)) {

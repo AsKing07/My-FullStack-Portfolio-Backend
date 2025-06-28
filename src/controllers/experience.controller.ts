@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { ExpType, PrismaClient } from '@prisma/client';
 import { asyncHandler, createError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
 import { Request, Response } from 'express';
@@ -85,7 +85,8 @@ export const createExperience = asyncHandler(async (req: AuthRequest, res: Respo
         throw createError('La date de fin ne peut pas être antérieure à la date de début', 400);
     }
 
-    if(type && !['FULL_TIME', 'PART_TIME', 'CONTRACT', 'INTERNSHIP'].includes(type)) {
+      if(type && !Object.values(ExpType).includes(type)) {
+
         throw createError('Type d\'expérience invalide. Doit être une des valeurs suivantes : FULL_TIME, PART_TIME, CONTRACT, INTERNSHIP', 400);
     }
 
@@ -136,7 +137,7 @@ export const updateExperience = asyncHandler(async (req: AuthRequest, res: Respo
         throw createError('La date de fin ne peut pas être antérieure à la date de début', 400);
     }
 
-    if(type && !['FULL_TIME', 'PART_TIME', 'CONTRACT', 'INTERNSHIP'].includes(type)) {
+ if(type && !Object.values(ExpType).includes(type)) {
         throw createError('Type d\'expérience invalide. Doit être une des valeurs suivantes : FULL_TIME, PART_TIME, CONTRACT, INTERNSHIP', 400);
     }
 

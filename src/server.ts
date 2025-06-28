@@ -74,7 +74,7 @@ class Server {
             skipSuccessfulRequests: true,
         });
 
-        this.app.use('/api/', limiter);
+        // this.app.use('/api/', limiter);
         this.app.use('/api/auth', authLimiter);
 
 

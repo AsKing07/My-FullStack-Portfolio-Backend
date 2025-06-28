@@ -52,7 +52,7 @@ export const getCategoryBySlug = asyncHandler(async (req: Request, res: Response
     }
 
     const category = await prisma.category.findUnique({
-        where: { slug }
+        where: { slug: slug }
     });
 
     if (!category) {

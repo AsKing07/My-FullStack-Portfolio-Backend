@@ -2,6 +2,7 @@ import { AuthRequest } from "@/middleware/auth";
 import { asyncHandler, createError } from '../middleware/errorHandler';
 import { Request, Response } from 'express';
 import { saveImage, deleteImage } from "@/utils/saveFile_utils";
+import { PostStatus } from "@prisma/client";
 
 
 const {PrismaClient} = require('@prisma/client');
@@ -203,7 +204,7 @@ exports.getPostBySlug = asyncHandler(async (req: Request, res: Response) => {
             }
         }
     });
-    if (!post || post.status !== 'PUBLISHED') {
+    if (!post ) {
         throw createError('Article non trouvé', 404);
     }
     res.status(200).json({
@@ -220,13 +221,16 @@ exports.getPostBySlug = asyncHandler(async (req: Request, res: Response) => {
  * @access Private (Admin Only)
  */
 exports.createPost = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { title, slug, content, excerpt, status, featured, metaTitle, metaDesc } = req.body;
+    const { title, slug, content, excerpt, status, featured, metaTitle, metaDesc, readingTime } = req.body;
+
+    let featuredConverted = (featured === 'false' || featured === false) ? false : true;
+    let readingTimeConverted = readingTime ? parseInt(readingTime) : null;
 
     if (!title || !slug || !content) {
         throw createError('Titre, slug et contenu sont requis', 400);
     }
 
-    if (typeof status !== 'string' || !['DRAFT', 'PUBLISHED', 'ARCHIVED'].includes(status)) {
+    if (status && !Object.values(PostStatus).includes(status as PostStatus)) {
         throw createError('Statut invalide, doit être DRAFT, PUBLISHED ou ARCHIVED', 400);
     }
 
@@ -239,6 +243,9 @@ exports.createPost = asyncHandler(async (req: AuthRequest, res: Response) => {
         data: {
             ...req.body,
             image: imageUrl,
+            featured: featuredConverted,
+            readingTime: readingTimeConverted,
+            status: status || 'DRAFT', 
             userId: req.user?.id
         },
         select: {
@@ -345,7 +352,7 @@ exports.updatePost = asyncHandler(async (req: AuthRequest, res: Response) => {
 
     const updatedData: any = { ...req.body };
 
-    if (updatedData.image) {
+    if (req.file ) {
 
         // If an image is provided, delete the old image if it exists
         if (post.image) {
@@ -354,9 +361,22 @@ exports.updatePost = asyncHandler(async (req: AuthRequest, res: Response) => {
 
 
         //Save the image to the uploads folder and get the url
-        const imageUrl = await saveImage(updatedData.image, 'blog');
+        const imageUrl = await saveImage(req.file, 'blog');
         updatedData.image = imageUrl;
     }
+    if (updatedData.featured) {
+        updatedData.featured = (updatedData.featured === 'false' || updatedData.featured === false) ? false : true;
+    }
+    if (updatedData.readingTime) {
+        updatedData.readingTime = parseInt(updatedData.readingTime);
+    }
+
+    
+    if (updatedData.status && !Object.values(PostStatus).includes(updatedData.status as PostStatus)) {
+        throw createError('Statut invalide, doit être DRAFT, PUBLISHED ou ARCHIVED', 400);
+    }
+
+
 
     const updatedPost = await prisma.blogPost.update({
         where: { id },

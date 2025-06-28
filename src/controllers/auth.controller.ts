@@ -234,7 +234,7 @@ export const updateUser = asyncHandler(async (req: AuthRequest, res: Response) =
     });
 
     res.json({
-        success: true,
+        success: true, 
         message: 'Profil mis à jour avec succès',
         data: { items: updateUser }
     });
@@ -248,8 +248,7 @@ export const updateResume = asyncHandler(async (req: AuthRequest, res: Response)
         throw createError('Aucun fichier CV fourni', 400);
     }
 
-    const newResumeUrl = await savePdf(req.file, 'cv');
-    const user = await prisma.user.findFirst();
+        const user = await prisma.user.findFirst();
     if (!user) {
         throw createError('Utilisateur non trouvé', 404);
     }
@@ -257,6 +256,9 @@ export const updateResume = asyncHandler(async (req: AuthRequest, res: Response)
         await deletePdf(user.resumeUrl);
     }
 
+
+
+    const newResumeUrl = await savePdf(req.file, 'cv');
 
     const updateCv = await prisma.user.update({
         where: { id: req.user!.id },

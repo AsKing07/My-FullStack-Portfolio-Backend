@@ -1,4 +1,4 @@
-const cors = require('cors');
+import cors from 'cors';
 
 
       // Configuration CORS
@@ -35,4 +35,4 @@ const cors = require('cors');
             optionSuccessStatus: 200
         };
 
-        module.exports = cors(corsOptions);
+ export const corsMiddleware = cors(corsOptions);

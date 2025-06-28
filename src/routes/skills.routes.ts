@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
+import { getSkills, getSkill, addSkill, updateSkill, deleteSkill } from '../controllers/skills.controller';
 
 const router = express.Router();
-const { getSkills, getSkill, addSkill, updateSkill, deleteSkill } = require('../controllers/skills.controller');
 
 import { authenticate } from '../middleware/auth';
 

@@ -1,5 +1,7 @@
-const { PrismaClient } = require('@prisma/client');
-const { asyncHandler, createError } = require('../middleware/errorHandler');
+import { asyncHandler, createError } from '@/middleware/errorHandler';
+import { PrismaClient } from '@prisma/client';
+
+
 import { AuthRequest } from '../middleware/auth';
 import { Request, Response } from 'express';
 

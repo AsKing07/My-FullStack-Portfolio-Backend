@@ -1,5 +1,5 @@
-const { PrismaClient } = require('@prisma/client');
-const { asyncHandler, createError } = require('../middleware/errorHandler');
+import { asyncHandler, createError } from '@/middleware/errorHandler';
+import { PrismaClient } from '@prisma/client';
 import { SkillLevel } from '@prisma/client';
 import { AuthRequest } from '../middleware/auth';
 import { Request, Response } from 'express';
@@ -12,7 +12,7 @@ const prisma = new PrismaClient();
  * @route GET /api/skills
  * @access Public
  */
-exports.getSkills = asyncHandler(async (req: Request, res: Response) => {
+export const getSkills = asyncHandler(async (req: Request, res: Response) => {
     const { page = '1', limit = '10', category } = req.query;
 
     const pageNum = parseInt(page as string);
@@ -63,8 +63,12 @@ exports.getSkills = asyncHandler(async (req: Request, res: Response) => {
  * @route GET /api/skills/:id
  * @access Public
  */
-exports.getSkill = asyncHandler(async (req: Request, res: Response) => {
+export const getSkill = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
+
+    if (!id) {
+        throw createError('ID manquant', 400);
+    }
 
     const skill = await prisma.skill.findUnique({
         where: {
@@ -95,7 +99,7 @@ exports.getSkill = asyncHandler(async (req: Request, res: Response) => {
  * @route POST /api/skills
  * @access Private (Admin)
  */
-exports.addSkill = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const addSkill = asyncHandler(async (req: AuthRequest, res: Response) => {
     const { name, level, yearsExp, categoryId } = req.body;
     if (!name) {
         throw createError('Le champs nom est obligatoire', 400);
@@ -147,7 +151,7 @@ exports.addSkill = asyncHandler(async (req: AuthRequest, res: Response) => {
  * @route PUT /api/skills/:id
  * @access Private (Admin)
  */
-exports.updateSkill = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const updateSkill = asyncHandler(async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { name, level, yearsExp, categoryId, icon } = req.body;
 
@@ -167,8 +171,7 @@ exports.updateSkill = asyncHandler(async (req: AuthRequest, res: Response) => {
         const  existingSkill = await prisma.skill.findFirst({
         where: {
             name: {
-                equals: name,
-                mode: 'insensitive'
+                equals: name.toLowerCase()
             }
         }
     });
@@ -218,7 +221,7 @@ exports.updateSkill = asyncHandler(async (req: AuthRequest, res: Response) => {
  * @route DELETE /api/skills/:id
  * @access Private (Admin)
  */
-exports.deleteSkill = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const deleteSkill = asyncHandler(async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
 
     if (!id) {

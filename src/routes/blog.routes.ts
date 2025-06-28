@@ -1,14 +1,6 @@
-const express = require('express');
+import express from 'express';
+import {getPosts, getPostsAdmin, getPostBySlug, createPost, updatePost, deletePost, publishPost} from '../controllers/blog.controller';
 
-const{
-    getPosts,
-    getPostsAdmin,
-    getPostBySlug,
-    createPost,
-    updatePost,
-    deletePost,
-    publishPost
-} = require('../controllers/blog.controller');
 
 import {authenticate} from '../middleware/auth';
 const router = express.Router();

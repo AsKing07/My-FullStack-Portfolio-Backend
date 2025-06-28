@@ -3,9 +3,9 @@ import { asyncHandler, createError } from '../middleware/errorHandler';
 import { Request, Response } from 'express';
 import { saveImage, deleteImage } from "@/utils/saveFile_utils";
 import { PostStatus } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 
-const {PrismaClient} = require('@prisma/client');
 const prisma = new PrismaClient();
 
 /**
@@ -13,7 +13,7 @@ const prisma = new PrismaClient();
  * @route GET /api/blog
  * @access Public
  */
-exports.getPosts = asyncHandler(async (req: Request, res: Response)=>{
+const getPosts = asyncHandler(async (req: Request, res: Response)=>{
     const {
         published, limit = 10, page = 1,   
     } = req.query;
@@ -35,7 +35,7 @@ exports.getPosts = asyncHandler(async (req: Request, res: Response)=>{
     let options = {
         where: where,
         orderBy: {
-            createdAt: 'desc'
+            createdAt: 'desc' as const
         },
         select: {
             id: true,
@@ -101,7 +101,7 @@ exports.getPosts = asyncHandler(async (req: Request, res: Response)=>{
  * @route GET /api/blog/admin
  * @access Private (Admin Only)
  */
-exports.getPostsAdmin = asyncHandler(async (req: AuthRequest, res: Response) => {
+const getPostsAdmin = asyncHandler(async (req: AuthRequest, res: Response) => {
     const {
         published, limit = 10, page = 1,
     } = req.query;
@@ -123,7 +123,7 @@ exports.getPostsAdmin = asyncHandler(async (req: AuthRequest, res: Response) => 
     let options = {
         where: where,
         orderBy: {
-            createdAt: 'desc'
+            createdAt: 'desc' as const
         },
         select: {
             id: true,
@@ -173,7 +173,7 @@ exports.getPostsAdmin = asyncHandler(async (req: AuthRequest, res: Response) => 
  * @route GET /api/blog/:slug
  * @access Public
  */
-exports.getPostBySlug = asyncHandler(async (req: Request, res: Response) => {
+const getPostBySlug = asyncHandler(async (req: Request, res: Response) => {
     const { slug } = req.params;
     if (!slug) {
         throw createError('Slug manquant', 400);
@@ -220,7 +220,7 @@ exports.getPostBySlug = asyncHandler(async (req: Request, res: Response) => {
  * @route POST /api/blog
  * @access Private (Admin Only)
  */
-exports.createPost = asyncHandler(async (req: AuthRequest, res: Response) => {
+const createPost = asyncHandler(async (req: AuthRequest, res: Response) => {
     const { title, slug, content, excerpt, status, featured, metaTitle, metaDesc, readingTime } = req.body;
 
     let featuredConverted = (featured === 'false' || featured === false) ? false : true;
@@ -279,7 +279,7 @@ exports.createPost = asyncHandler(async (req: AuthRequest, res: Response) => {
  * @route PUT /api/blog/:id/publish
  *  @access Private (Admin Only)
  */
-exports.publishPost = asyncHandler(async (req: AuthRequest, res: Response) => {
+const publishPost = asyncHandler(async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     if (!id) {
         throw createError('ID manquant', 400);
@@ -336,7 +336,7 @@ exports.publishPost = asyncHandler(async (req: AuthRequest, res: Response) => {
  * @route PUT /api/blog/:id
  * @access Private (Admin Only)
  */
-exports.updatePost = asyncHandler(async (req: AuthRequest, res: Response) => {
+const updatePost = asyncHandler(async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     if (!id) {
         throw createError('ID manquant', 400);
@@ -414,7 +414,7 @@ exports.updatePost = asyncHandler(async (req: AuthRequest, res: Response) => {
  * @route DELETE /api/blog/:id
  * @access Private (Admin Only)
  */
-exports.deletePost = asyncHandler(async (req: AuthRequest, res: Response) => {
+const deletePost = asyncHandler(async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     if (!id) {
         throw createError('ID manquant', 400);
@@ -445,6 +445,16 @@ exports.deletePost = asyncHandler(async (req: AuthRequest, res: Response) => {
 
 
 
+
+export {
+    getPosts,
+    getPostsAdmin,
+    getPostBySlug,
+    createPost,
+    publishPost,
+    updatePost,
+    deletePost
+};
 
 
 

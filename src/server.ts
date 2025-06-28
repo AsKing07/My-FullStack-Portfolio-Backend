@@ -1,5 +1,5 @@
-require('dotenv').config(); 
-import express, { Application, Request, Response } from 'express';
+import dotenv from 'dotenv';
+dotenv.config();import express, { Application, Request, Response } from 'express';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { PrismaClient } from '@prisma/client';
@@ -22,7 +22,8 @@ import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
 import { requestLogger } from './middleware/logger';
 import { prisma } from './config/prisma';
-const corsMiddleware = require('./middleware/cors');
+import { corsMiddleware } from './middleware/cors';
+
 
 
 class Server {

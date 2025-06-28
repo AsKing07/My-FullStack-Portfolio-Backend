@@ -1,4 +1,5 @@
-const {getGithubStats, getGithubProfile, getGithubRepos} = require('../services/github.service');
+
+import { getGithubProfile, getGithubRepos, getGithubStats } from '@/services/github.service';
 import { asyncHandler, createError } from '../middleware/errorHandler';
 import { Request, Response } from 'express';
 

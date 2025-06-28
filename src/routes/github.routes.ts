@@ -1,6 +1,9 @@
 
-const express = require('express');
-const { getGithubStatsController, getGithubProfileController, getGithubReposController } = require('../controllers/github.controller');
+import express from 'express';
+
+import  { getGithubStatsController, getGithubProfileController, getGithubReposController } from '@/controllers/github.controller';
+
+
 
 const router = express.Router();
 

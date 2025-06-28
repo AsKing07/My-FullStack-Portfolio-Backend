@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 
 import { getCategories, getCategoryBySlug, updateCategory, createCategory, deleteCategory } from '../controllers/category.controller';
 import { authenticate } from '../middleware/auth';

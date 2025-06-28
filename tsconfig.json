@@ -10,7 +10,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "declaration": true,
+    "declaration": false,
     "declarationMap": true,
     "sourceMap": true,
     "removeComments": true,
@@ -33,7 +33,7 @@
     }
   },
   "include": [
-    "src/**/*.ts",
+    "src/**/*",
     "src/**/*.json"
   ],
   "exclude": [

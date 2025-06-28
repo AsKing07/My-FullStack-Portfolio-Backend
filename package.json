@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/server.ts",
     "build": "tsc",
-    "start": "node src/server.ts",
+    "start": "node src/server.js",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write src/**/*.ts",

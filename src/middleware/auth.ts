@@ -13,6 +13,12 @@ export interface AuthRequest extends Request {
         currentPassword?: string;
         newPassword?: string;
     };
+      body: any;
+  params: any;
+  query: any;
+  file?: Express.Multer.File;
+  files?: Express.Multer.File[] | { [fieldname: string]: Express.Multer.File[] };
+  headers: any;
 }
 
 // Vérification du token JWT

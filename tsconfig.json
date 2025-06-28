@@ -19,14 +19,14 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"],
-      "@/controllers/*": ["src/controllers/*"],
-      "@/middleware/*": ["src/middleware/*"],
-      "@/routes/*": ["src/routes/*"],
-      "@/services/*": ["src/services/*"],
-      "@/types/*": ["src/types/*"],
-      "@/utils/*": ["src/utils/*"],
-      "@/config/*": ["src/config/*"],
-      "@/prisma/*": ["prisma/*"]
+      // "@/controllers/*": ["src/controllers/*"],
+      // "@/middleware/*": ["src/middleware/*"],
+      // "@/routes/*": ["src/routes/*"],
+      // "@/services/*": ["src/services/*"],
+      // "@/types/*": ["src/types/*"],
+      // "@/utils/*": ["src/utils/*"],
+      // "@/config/*": ["src/config/*"],
+      // "@/prisma/*": ["prisma/*"]
     }
   },
   "include": [

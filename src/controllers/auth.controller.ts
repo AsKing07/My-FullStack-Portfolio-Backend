@@ -1,11 +1,11 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { asyncHandler, createError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
 import { generateTokens } from '../middleware/auth';
-import { deleteImage, deletePdf, saveImage, savePdf } from '@/utils/saveFile_utils';
+import { deleteImage, deletePdf, saveImage, savePdf } from "../utils/saveFile_utils"
 
 
 const prisma = new PrismaClient();

@@ -1,3 +1,4 @@
+import 'module-alias/register';
 import dotenv from 'dotenv';
 dotenv.config();import express, { Application, Request, Response } from 'express';
 import helmet from 'helmet';

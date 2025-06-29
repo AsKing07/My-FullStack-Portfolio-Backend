@@ -15,7 +15,6 @@ import experienceRoutes from './routes/experience.routes';
 import educationRoutes from './routes/education.routes';
 import contactRoutes from './routes/contact.routes';
 import blogRoutes from './routes/blog.routes';
-// import uploadRoutes from './routes/upload.routes';
 import githubRoutes from './routes/github.routes';
 
 // Import des middlewares
@@ -61,7 +60,7 @@ class Server {
         // Rate limiting
         const limiter = rateLimit({
             windowMs: 15 * 60 * 1000, // 15 minutes
-            max: 100, // limite à 100 requêtes par windowMs
+            max: 150, // limite à 150 requêtes par windowMs
             message: {
                 error: 'Trop de requêtes depuis cette IP, veuillez réessayer plus tard.'
             },
@@ -72,11 +71,11 @@ class Server {
         // Rate limiting spécifique pour les APIs sensibles
         const authLimiter = rateLimit({
             windowMs: 15 * 60 * 1000, // 15 minutes
-            max: 5, // 5 tentatives de connexion max
+            max: 30, // 5 tentatives de connexion max
             skipSuccessfulRequests: true,
         });
 
-        // this.app.use('/api/', limiter);
+        this.app.use('/api/', limiter);
         this.app.use('/api/auth', authLimiter);
 
 
@@ -135,7 +134,6 @@ class Server {
         this.app.use('/api/educations', educationRoutes);
         this.app.use('/api/contacts', contactRoutes);
         this.app.use('/api/blog', blogRoutes);
-        // this.app.use('/api/uploads', uploadRoutes);
         this.app.use('/api/github', githubRoutes);
     }
 
@@ -157,8 +155,8 @@ class Server {
         this.app.listen(this.port, () => {
             console.log(`🚀 Serveur démarré sur le port ${this.port}`);
             console.log(`📍 Mode: ${process.env.NODE_ENV || 'development'}`);
-            console.log(`🌐 URL: http://localhost:${this.port}`);
-            console.log(`📚 Health check: http://localhost:${this.port}/health`);
+            console.log(`🌐 URL: ${process.env.DOMAIN || 'http://localhost'}:${this.port}`);
+            console.log(`📚 Health check:  ${process.env.DOMAIN || 'http://localhost'}:${this.port}/health`);
 
             if (process.env.NODE_ENV === 'development') {
                 console.log(`🔧 Prisma Studio: npx prisma studio`);

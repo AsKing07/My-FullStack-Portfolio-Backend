@@ -251,7 +251,7 @@ class Server {
             });
         } else {
             // En développement, servir une page d'index ou l'API info
-            this.app.get('/{*/any}', (req: Request, res: Response, next) => {
+            this.app.get('/{*any}', (req: Request, res: Response, next) => {
                 if (req.path.startsWith('/api/') || 
                     req.path.startsWith('/uploads/') || 
                     req.path.startsWith('/_next/') ||

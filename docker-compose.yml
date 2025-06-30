@@ -1,0 +1,16 @@
+services:
+  # Application principale
+  portfolio-backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    volumes:
+      # Persister les uploads
+      - ./uploads:/app/uploads
+    restart: unless-stopped

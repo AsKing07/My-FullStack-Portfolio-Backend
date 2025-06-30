@@ -2,7 +2,10 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
-    "lib": ["ES2020", "DOM"],
+    "lib": [
+      "ES2020",
+      "DOM"
+    ],
     "moduleResolution": "node",
     "outDir": "./dist",
     "rootDir": "./src",
@@ -18,7 +21,9 @@
     "noImplicitAny": false,
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": [
+        "src/*"
+      ]
       // "@/controllers/*": ["src/controllers/*"],
       // "@/middleware/*": ["src/middleware/*"],
       // "@/routes/*": ["src/routes/*"],
@@ -27,10 +32,21 @@
       // "@/utils/*": ["src/utils/*"],
       // "@/config/*": ["src/config/*"],
       // "@/prisma/*": ["prisma/*"]
-    }
+    },
+    "noEmit": false,
+    "incremental": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
-    "src/**/*"
+    ".next/types/**/*.ts",
+    "src/**/*",
+    "build/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
@@ -39,6 +55,8 @@
     "**/*.spec.ts"
   ],
   "ts-node": {
-    "require": ["tsconfig-paths/register"]
+    "require": [
+      "tsconfig-paths/register"
+    ]
   }
 }
